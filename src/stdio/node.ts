@@ -1,5 +1,5 @@
 // stdio_node.ts
-import { type StdioInterface } from "./stdio";
+import { type StdioInterface } from "./stdio.ts";
 
 export class NodeStdio implements StdioInterface {
   constructor(

@@ -1,11 +1,10 @@
-import { proxy, wrap } from "@huakunshen/comlink";
-import { ProcessChannel } from "./src/bidirectional";
-import { apiMethods, type API } from "./src/api";
+import { ProcessChannel } from "../src/bidirectional.ts";
+import { apiMethods, type API } from "./api.ts";
 import { spawn } from "child_process";
-import { NodeStdio } from "./src/stdio";
-// import { createStdio } from "./src/stdio";
+import { NodeStdio } from "../src/stdio/index.ts";
 
-const worker = spawn("bun", ["child.ts"]);
+const worker = spawn("deno", ["examples/deno-child.ts"]);
+// const worker = spawn("bun", ["examples/node-child.ts"]);
 worker.stderr.pipe(process.stdout);
 
 // const stdio = createStdio();

@@ -1,28 +1,8 @@
-import { isDeno, isNode } from "../env";
-import { DenoStdio } from "./deno";
-import { NodeStdio } from "./node";
+import { isDeno, isNode } from "../env.ts";
+import { DenoStdio } from "./deno.ts";
+import { NodeStdio } from "./node.ts";
+import type { StdioInterface } from "./stdio.ts";
 
-import type { StdioInterface } from "./stdio";
-
-// export function createStdio(
-//   read?: NodeJS.ReadableStream,
-//   write?: NodeJS.WritableStream
-// ): StdioInterface {
-//   //   if (typeof process !== "undefined" && process.stdin && process.stdout) {
-//   if (isNode) {
-//     // Assume Node.js environment
-//     return new NodeStdio(stdin ?? process.stdin, stdout ?? process.stdout);
-//   } else if (isDeno) {
-//     //   } else if (typeof Deno !== "undefined" && Deno.stdin && Deno.stdout) {
-//     // Assume Deno environment
-//     return new DenoStdio();
-//   } else {
-//     throw new Error(
-//       "Unsupported environment: Neither Node.js nor Deno detected."
-//     );
-//   }
-// }
-
-export * from "./stdio";
-export { NodeStdio } from "./node";
-export { DenoStdio } from "./deno";
+export * from "./stdio.ts";
+export { NodeStdio } from "./node.ts";
+export { DenoStdio } from "./deno.ts";

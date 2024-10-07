@@ -6,8 +6,8 @@ import {
   deserializeResponse,
   type Message,
   type Response,
-} from "./serialization";
-import type { StdioInterface } from "./stdio";
+} from "./serialization.ts";
+import type { StdioInterface } from "./stdio/index.ts";
 
 interface PendingRequest {
   resolve: (result: any) => void;
@@ -35,7 +35,8 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       //   console.error("buffer.toString()", buffer.toString());
 
       if (buffer) {
-        const messageStr = buffer.toString();
+        const messageStr = buffer.toString('utf-8');
+        
         const parsedMessage = await deserializeMessage(messageStr);
 
         if (parsedMessage.type === "response") {

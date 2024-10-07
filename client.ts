@@ -1,6 +1,6 @@
 // client.ts
 import { spawn, ChildProcess } from "child_process";
-import { type API } from "./src/api";
+import { type API } from "./examples/api";
 
 class WorkerClient {
   private worker: ChildProcess;
