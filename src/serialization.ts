@@ -17,8 +17,16 @@ export function serializeMessage<T>(message: Message<T>): string {
 }
 
 // Deserialize a message
-export function deserializeMessage<T>(message: string): Message<T> {
-  return JSON.parse(message);
+export function deserializeMessage<T>(message: string): Promise<Message<T>> {
+  return new Promise((resolve, reject) => {
+    try {
+      const parsed = JSON.parse(message);
+      resolve(parsed);
+    } catch (error) {
+      console.error("failed to parse", message);
+      reject(error);
+    }
+  });
 }
 
 // Serialize a response
@@ -27,6 +35,14 @@ export function serializeResponse<T>(response: Response<T>): string {
 }
 
 // Deserialize a response
-export function deserializeResponse<T>(response: string): Response<T> {
-  return JSON.parse(response);
+export function deserializeResponse<T>(response: string): Promise<Response<T>> {
+  return new Promise((resolve, reject) => {
+    try {
+      const parsed = JSON.parse(response);
+      resolve(parsed);
+    } catch (error) {
+      console.error("failed to parse", response);
+      reject(error);
+    }
+  });
 }

@@ -7,7 +7,7 @@ import {
   type Message,
   type Response,
 } from "./serialization";
-// import { type API } from "./api";
+import type { StdioInterface } from "./stdio";
 
 interface PendingRequest {
   resolve: (result: any) => void;
@@ -19,11 +19,34 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private pendingRequests: Record<number, PendingRequest> = {};
 
   constructor(
-    private input: NodeJS.ReadableStream,
-    private output: NodeJS.WritableStream,
+    private stdio: StdioInterface,
     private apiImplementation: LocalAPI
   ) {
-    this.input.on("data", this.handleIncomingMessage.bind(this));
+    this.listen();
+  }
+
+  private async listen(): Promise<void> {
+    while (true) {
+      const buffer = await this.stdio.read();
+      if (!buffer) {
+        continue;
+      }
+      //   console.error("got buffer", buffer);
+      //   console.error("buffer.toString()", buffer.toString());
+
+      if (buffer) {
+        const messageStr = buffer.toString();
+        const parsedMessage = await deserializeMessage(messageStr);
+
+        if (parsedMessage.type === "response") {
+          // Handle response
+          this.handleResponse(parsedMessage as Message<Response<any>>);
+        } else if (parsedMessage.type === "request") {
+          // Handle request
+          this.handleRequest(parsedMessage);
+        }
+      }
+    }
   }
 
   // Send a method call to the other process
@@ -42,25 +65,9 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
         args,
         type: "request",
       };
-
-      this.output.write(serializeMessage(message) + "\n");
+      //   this.output.write(serializeMessage(message) + "\n");
+      this.stdio.write(serializeMessage(message));
     });
-  }
-
-  // Handle incoming messages (both requests and responses)
-  private handleIncomingMessage(data: Buffer): void {
-    const messages = data.toString().split("\n").filter(Boolean);
-    for (const message of messages) {
-      const parsedMessage: Message<unknown> = deserializeMessage(message);
-
-      if (parsedMessage.type === "response") {
-        // Handle response
-        this.handleResponse(parsedMessage as Message<Response<any>>);
-      } else if (parsedMessage.type === "request") {
-        // Handle request
-        this.handleRequest(parsedMessage);
-      }
-    }
   }
 
   // Handle response to a request we sent
@@ -115,7 +122,7 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       args: { result },
       type: "response",
     };
-    this.output.write(serializeMessage(response) + "\n");
+    this.stdio.write(serializeMessage(response));
   }
 
   // Send an error response
@@ -126,15 +133,17 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       args: { error },
       type: "response",
     };
-    this.output.write(serializeMessage(response) + "\n");
+    this.stdio.write(serializeMessage(response));
   }
 
   public getApi(): RemoteAPI {
     return new Proxy({} as RemoteAPI, {
       get:
         (_, method: string) =>
-        (...args: unknown[]) =>
-          this.callMethod(method as keyof RemoteAPI, args),
+        (...args: unknown[]) => {
+          //   console.log("getApi", method, args);
+          return this.callMethod(method as keyof RemoteAPI, args);
+        },
     });
   }
 }
