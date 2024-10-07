@@ -1,5 +1,12 @@
 # comlink-stdio
 
+[![NPM Version](https://img.shields.io/npm/v/comlink-stdio)](https://www.npmjs.com/package/comlink-stdio)
+![JSR Version](https://img.shields.io/jsr/v/hk/comlink-stdio)
+[![Publish](https://github.com/HuakunShen/comlink-stdio/actions/workflows/jsr-publish.yml/badge.svg)](https://github.com/HuakunShen/comlink-stdio/actions/workflows/jsr-publish.yml)
+
+- [TypeDoc Documentation](https://huakunshen.github.io/tauri-plugin-shellx/)
+- [JSR Documentation](https://jsr.io/@hk/comlink-stdio/doc)
+
 This project is a stdio version of comlink. Making it easier to do IPC between TypeScript processes using RPC style API calls.
 
 > Regular js/ts files can directly import/require each other as libraries, this package isn't designed for these normal use cases, but designed for special scenarios where 2 JS processes are not in the same environment. 
@@ -7,7 +14,10 @@ This project is a stdio version of comlink. Making it easier to do IPC between T
 > However, stdio's `argv`, `stdin`, `stdout` is too low level, implementing API calls with them requires CLI-style programming, which is very inconvenient.
 > `comlink-stdio` mimics `comlink` style API, making RPC-style API calls over stdio very easy.
 
+> This package is a completly TypeScript project, no JS bundle will be generated. If you write JS, you lose the main benefit of this package, which is RPC with type auto-complete.
+
 ## Support
+
 - Node.JS
 - Deno
 - Bun

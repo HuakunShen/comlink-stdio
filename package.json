@@ -1,12 +1,31 @@
 {
   "name": "comlink-stdio",
-  "module": "index.ts",
+  "module": "mod.ts",
+  "version": "0.1.1",
+  "scripts": {
+    "predocs": "deno types > deno.d.ts",
+    "docs": "typedoc --out docs mod.ts"
+  },
+  "author": {
+    "name": "Huakun Shen",
+    "url": "https://github.com/huakunshen"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huakunshen/comlink-stdio.git"
+  },
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typedoc": "^0.26.8"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "files": [
+    "README.md",
+    "src",
+    "mod.ts"
+  ]
 }
