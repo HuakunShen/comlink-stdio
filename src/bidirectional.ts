@@ -35,8 +35,8 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       //   console.error("buffer.toString()", buffer.toString());
 
       if (buffer) {
-        const messageStr = buffer.toString('utf-8');
-        
+        const messageStr = buffer.toString("utf-8");
+
         const parsedMessage = await deserializeMessage(messageStr);
 
         if (parsedMessage.type === "response") {
@@ -55,7 +55,7 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
     method: T,
     args: any[]
     // ...args: Parameters<API[T] extends (...args: any) => any ? API[T] : never>
-  ) {
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       const messageId = this.idCounter++;
       this.pendingRequests[messageId] = { resolve, reject };

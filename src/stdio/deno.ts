@@ -1,4 +1,4 @@
-import type { StdioInterface } from "../src/stdio/stdio.ts";
+import type { StdioInterface } from "./stdio.ts";
 import { Buffer } from "node:buffer";
 
 export class DenoStdio implements StdioInterface {
