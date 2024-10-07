@@ -11,7 +11,7 @@
   },
   "exports": {
     ".": "./mod.ts",
-    "./deno": "./browser-mod.ts"
+    "./browser": "./browser-mod.ts"
   },
   "repository": {
     "type": "git",

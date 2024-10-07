@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "exports": {
     ".": "./mod.ts",
-    "./deno": "./browser-mod.ts"
+    "./browser": "./browser-mod.ts"
   },
   "tasks": {},
   "imports": {
