@@ -1,10 +1,14 @@
 {
   "name": "@hk/comlink-stdio",
-  "version": "0.1.1",
-  "exports": "./mod.ts",
+  "version": "0.1.2",
+  "exports": {
+    ".": "./mod.ts",
+    "./deno": "./browser-mod.ts"
+  },
   "tasks": {},
   "imports": {
-    "@std/assert": "jsr:@std/assert@1"
+    "@std/assert": "jsr:@std/assert@1",
+    "buffer": "npm:buffer@6.0.3"
   },
   "exclude": ["./examples"]
 }

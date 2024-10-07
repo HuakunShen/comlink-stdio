@@ -1,4 +1,4 @@
-import { Buffer } from "node:buffer";
+import { type Buffer } from "buffer";
 
 export interface StdioInterface {
   read(): Promise<Buffer | Uint8Array | null>; // Reads input

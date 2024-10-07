@@ -1,5 +1,5 @@
 // stdio_node.ts
-import { type StdioInterface } from "./stdio.ts";
+import { type StdioInterface } from "./interface.ts";
 
 /**
  * Stdio implementation for Node.js

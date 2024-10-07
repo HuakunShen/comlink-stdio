@@ -1,4 +1,4 @@
-import type { StdioInterface } from "./stdio.ts";
+import type { StdioInterface } from "./interface.ts";
 import { Buffer } from "node:buffer";
 
 /**

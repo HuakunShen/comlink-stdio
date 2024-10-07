@@ -1,6 +1,2 @@
-export { ProcessChannel } from "./src/bidirectional.ts";
-export {
-  NodeStdio,
-  DenoStdio,
-  type StdioInterface,
-} from "./src/stdio/index.ts";
+export * from "./browser-mod.ts";
+export { DenoStdio } from "./src/stdio/deno.ts";

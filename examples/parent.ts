@@ -1,7 +1,7 @@
 import { ProcessChannel } from "../src/bidirectional.ts";
 import { apiMethods, type API } from "./api.ts";
 import { spawn } from "child_process";
-import { NodeStdio } from "../src/stdio/index.ts";
+import { NodeStdio } from "../mod.ts";
 
 const worker = spawn("deno", ["examples/deno-child.ts"]);
 // const worker = spawn("bun", ["examples/node-child.ts"]);

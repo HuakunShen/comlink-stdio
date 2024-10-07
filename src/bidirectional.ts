@@ -7,7 +7,7 @@ import {
   type Message,
   type Response,
 } from "./serialization.ts";
-import type { StdioInterface } from "./stdio/index.ts";
+import type { StdioInterface } from "./stdio/interface.ts";
 
 interface PendingRequest {
   resolve: (result: any) => void;
@@ -16,7 +16,7 @@ interface PendingRequest {
 
 /**
  * A bidirectional Stdio IPC channel in RPC style.
- * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style, 
+ * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style,
  * without needing to deal with `argv`, `stdin`, `stdout` directly.
  */
 export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {

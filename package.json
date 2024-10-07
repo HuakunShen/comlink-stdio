@@ -1,14 +1,17 @@
 {
   "name": "comlink-stdio",
-  "module": "mod.ts",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "predocs": "deno types > deno.d.ts",
-    "docs": "typedoc --out docs mod.ts"
+    "docs": "typedoc --out docs"
   },
   "author": {
     "name": "Huakun Shen",
     "url": "https://github.com/huakunshen"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./deno": "./browser-mod.ts"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
   "files": [
     "README.md",
     "src",
-    "mod.ts"
+    "mod.ts",
+    "browser-mod.ts"
   ]
 }
