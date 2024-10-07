@@ -1,6 +1,10 @@
 // stdio_node.ts
 import { type StdioInterface } from "./stdio.ts";
 
+/**
+ * Stdio implementation for Node.js
+ * Simply wrap Node.js's `process.stdin` and `process.stdout` to follow StdioInterface
+ */
 export class NodeStdio implements StdioInterface {
   constructor(
     private readStream: NodeJS.ReadableStream = process.stdin,

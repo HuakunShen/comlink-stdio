@@ -1,6 +1,11 @@
 import type { StdioInterface } from "./stdio.ts";
 import { Buffer } from "node:buffer";
 
+/**
+ * Stdio implementation for Deno
+ * Deno doesn't have `process` object, and have a completely different stdio API,
+ * This implementation wrap Deno's `Deno.stdin` and `Deno.stdout` to follow StdioInterface
+ */
 export class DenoStdio implements StdioInterface {
   private reader: ReadableStreamDefaultReader<Uint8Array>;
   private writer: WritableStreamDefaultWriter<Uint8Array>;

@@ -14,6 +14,11 @@ interface PendingRequest {
   reject: (error: any) => void;
 }
 
+/**
+ * A bidirectional Stdio IPC channel in RPC style.
+ * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style, 
+ * without needing to deal with `argv`, `stdin`, `stdout` directly.
+ */
 export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private idCounter = 0;
   private pendingRequests: Record<number, PendingRequest> = {};
