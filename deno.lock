@@ -3,8 +3,6 @@
   "packages": {
     "specifiers": {
       "npm:@types/bun@latest": "npm:@types/bun@1.1.9",
-      "npm:buffer": "npm:buffer@6.0.3",
-      "npm:buffer@6.0.3": "npm:buffer@6.0.3",
       "npm:typedoc@^0.26.8": "npm:typedoc@0.26.8_typescript@5.6.2"
     },
     "npm": {
@@ -95,21 +93,10 @@
         "integrity": "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         "dependencies": {}
       },
-      "base64-js@1.5.1": {
-        "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==",
-        "dependencies": {}
-      },
       "brace-expansion@2.0.1": {
         "integrity": "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
         "dependencies": {
           "balanced-match": "balanced-match@1.0.2"
-        }
-      },
-      "buffer@6.0.3": {
-        "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==",
-        "dependencies": {
-          "base64-js": "base64-js@1.5.1",
-          "ieee754": "ieee754@1.2.1"
         }
       },
       "bun-types@1.1.27": {
@@ -173,10 +160,6 @@
       },
       "html-void-elements@3.0.0": {
         "integrity": "sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==",
-        "dependencies": {}
-      },
-      "ieee754@1.2.1": {
-        "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==",
         "dependencies": {}
       },
       "linkify-it@5.0.0": {
@@ -378,13 +361,11 @@
   "remote": {},
   "workspace": {
     "dependencies": [
-      "jsr:@std/assert@1",
-      "npm:buffer@6.0.3"
+      "jsr:@std/assert@1"
     ],
     "packageJson": {
       "dependencies": [
         "npm:@types/bun@latest",
-        "npm:buffer",
         "npm:typedoc@^0.26.8"
       ]
     }
