@@ -5,7 +5,7 @@ import { type API } from "./src/api";
 class WorkerClient {
   private worker: ChildProcess;
   private pendingRequests: Record<number, PendingRequest> = {};
-  private id = 0;
+  private id = Math.floor(Math.random() * 1000000);
 
   constructor(scriptPath: string) {
     this.worker = spawn("bun", [scriptPath]);
@@ -13,7 +13,7 @@ class WorkerClient {
   }
 
   private setupWorkerCommunication() {
-    this.worker.stdout.on("data", (data) => {
+    this.worker.stdout?.on("data", (data) => {
       const messages = data.toString().split("\n").filter(Boolean);
       for (const message of messages) {
         const response = JSON.parse(message);
@@ -37,7 +37,7 @@ class WorkerClient {
     return new Promise((resolve, reject) => {
       const messageId = this.id++;
       this.pendingRequests[messageId] = { resolve, reject };
-      this.worker.stdin.write(
+      this.worker.stdin?.write(
         JSON.stringify({ id: messageId, method, args }) + "\n"
       );
     }) as ReturnType<API[T]>;
