@@ -1,10 +1,9 @@
 # comlink-stdio
 
 [![NPM Version](https://img.shields.io/npm/v/comlink-stdio)](https://www.npmjs.com/package/comlink-stdio)
-![JSR Version](https://img.shields.io/jsr/v/hk/comlink-stdio)
 [![Publish](https://github.com/HuakunShen/comlink-stdio/actions/workflows/jsr-publish.yml/badge.svg)](https://github.com/HuakunShen/comlink-stdio/actions/workflows/jsr-publish.yml)
 
-- [TypeDoc Documentation](https://huakunshen.github.io/tauri-plugin-shellx/)
+- [TypeDoc Documentation](https://huakunshen.github.io/comlink-stdio/)
 - [JSR Documentation](https://jsr.io/@hk/comlink-stdio/doc)
 
 This project is a stdio version of comlink. Making it easier to do IPC between TypeScript processes using RPC style API calls.
