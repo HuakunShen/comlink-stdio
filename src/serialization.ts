@@ -23,7 +23,7 @@ export function deserializeMessage<T>(message: string): Promise<Message<T>> {
       const parsed = JSON.parse(message);
       resolve(parsed);
     } catch (error) {
-      console.error("failed to parse", message);
+      console.error("failed to parse message", typeof message, message, error);
       reject(error);
     }
   });
@@ -41,7 +41,7 @@ export function deserializeResponse<T>(response: string): Promise<Response<T>> {
       const parsed = JSON.parse(response);
       resolve(parsed);
     } catch (error) {
-      console.error("failed to parse", response);
+      console.error("failed to parse response", response);
       reject(error);
     }
   });

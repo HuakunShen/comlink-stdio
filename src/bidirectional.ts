@@ -36,22 +36,43 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       if (!buffer) {
         continue;
       }
-      //   console.error("got buffer", buffer);
-      //   console.error("buffer.toString()", buffer.toString());
+      if (!buffer) {
+        return;
+      }
+      const messageStr = buffer.toString("utf-8");
+      if (messageStr.includes("\n")) {
+        const msgStrs = messageStr
+          .split("\n")
+          .map((msg) => msg.trim())
+          .filter(Boolean);
 
-      if (buffer) {
-        const messageStr = buffer.toString("utf-8");
-
-        const parsedMessage = await deserializeMessage(messageStr);
-
-        if (parsedMessage.type === "response") {
-          // Handle response
-          this.handleResponse(parsedMessage as Message<Response<any>>);
-        } else if (parsedMessage.type === "request") {
-          // Handle request
-          this.handleRequest(parsedMessage);
+        for (const msgStr of msgStrs) {
+          this.handleMessageStr(msgStr);
+        }
+      } else {
+        console.error("messageStr", messageStr);
+        if (messageStr.trim()) {
+          this.handleMessageStr(messageStr.trim());
         }
       }
+    }
+  }
+
+  private async handleMessageStr(messageStr: string): Promise<void> {
+    // console.error("messageStr", messageStr);
+    // console.error("messageStr", messageStr.trim());
+    const parsedMessage = await deserializeMessage(messageStr);
+    if (parsedMessage.type === "response") {
+      // Handle response
+      this.handleResponse(parsedMessage as Message<Response<any>>);
+    } else if (parsedMessage.type === "request") {
+      this.handleRequest(parsedMessage);
+    } else {
+      console.error(
+        "received unknown message type",
+        parsedMessage,
+        typeof parsedMessage
+      );
     }
   }
 
@@ -93,7 +114,6 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   // Handle incoming requests from the other process using a Proxy
   private handleRequest(request: Message): void {
     const { id, method, args } = request;
-
     const apiProxy = new Proxy(this.apiImplementation, {
       get: (target, prop: string) => {
         if (typeof target[prop as keyof LocalAPI] === "function") {
@@ -113,7 +133,9 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       );
 
       Promise.resolve(result)
-        .then((res) => this.sendResponse(id, res))
+        .then((res) => {
+          return this.sendResponse(id, res);
+        })
         .catch((err) => this.sendError(id, err.message));
     } catch (error: any) {
       this.sendError(id, error.message ?? error.toString());

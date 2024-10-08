@@ -8,14 +8,16 @@ import { Buffer } from "node:buffer";
  */
 export class DenoStdio implements StdioInterface {
   private reader: ReadableStreamDefaultReader<Uint8Array>;
-  private writer: WritableStreamDefaultWriter<Uint8Array>;
 
   constructor(
     private readStream: ReadableStream<Uint8Array>,
     private writeStream: WritableStream<Uint8Array>
   ) {
     this.reader = this.readStream.getReader();
-    this.writer = this.writeStream.getWriter();
+    const writer = this.writeStream.getWriter();
+    const encoder = new TextEncoder();
+
+    // writer.write(encoder.encode("hello"))
   }
 
   async read(): Promise<Buffer | null> {
@@ -28,7 +30,7 @@ export class DenoStdio implements StdioInterface {
 
   async write(data: string): Promise<void> {
     const encoder = new TextEncoder();
-    const encodedData = encoder.encode(data);
-    await this.writer.write(encodedData);
+    const encodedData = encoder.encode(data + "\n");
+    Deno.stdout.writeSync(encodedData);
   }
 }
