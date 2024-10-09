@@ -32,7 +32,7 @@ bun examples/parent.ts
 `parent.ts`, run `bun examples/parent.ts`
 
 ```ts
-import { ProcessChannel } from "../src/bidirectional.ts";
+import { StdioRPCChannel } from "../src/bidirectional.ts";
 import { apiMethods, type API } from "../src/api.ts";
 import { spawn } from "child_process";
 import { NodeStdio } from "../src/stdio/index.ts";
@@ -43,7 +43,7 @@ const worker = spawn("bun", ["examples/node-child.ts"]);
 worker.stderr.pipe(process.stdout);
 
 const stdio = new NodeStdio(worker.stdout, worker.stdin);
-const parent = new ProcessChannel<{}, API>(stdio, {});
+const parent = new StdioRPCChannel<{}, API>(stdio, {});
 const api = parent.getApi();
 
 await api.add(1, 2).then(console.log); // 3
@@ -54,28 +54,28 @@ worker.kill();
 `examples/node-child.ts`
 
 ```ts
-import { ProcessChannel } from "../src/bidirectional.ts";
+import { StdioRPCChannel } from "../src/bidirectional.ts";
 import { apiMethods } from "./api.ts";
 import { DenoStdio, NodeStdio } from "../src/stdio/index.ts";
 
 const stdio = new NodeStdio(process.stdin, process.stdout);
-const child = new ProcessChannel(stdio, apiMethods);
+const child = new StdioRPCChannel(stdio, apiMethods);
 ```
 
 
 `examples/deno-child.ts`
 
 ```ts
-import { ProcessChannel } from "../src/bidirectional.ts";
+import { StdioRPCChannel } from "../src/bidirectional.ts";
 import { apiMethods } from "./api.ts";
 import { DenoStdio, NodeStdio } from "../src/stdio/index.ts";
 
 const stdio = new DenoStdio(Deno.stdin.readable, Deno.stdout.writable);
-const child = new ProcessChannel(stdio, apiMethods);
+const child = new StdioRPCChannel(stdio, apiMethods);
 ```
 
 
-`ProcessChannel` is a bidirectional IPC channel, it can send and receive messages between processes.
-JavaScript proxy is used to forward API calls over stdio. You just need to pass an API interface to `ProcessChannel` as generic, then you get full auto-complete and type safety.
+`StdioRPCChannel` is a bidirectional IPC channel, it can send and receive messages between processes.
+JavaScript proxy is used to forward API calls over stdio. You just need to pass an API interface to `StdioRPCChannel` as generic, then you get full auto-complete and type safety.
 
-Since `ProcessChannel` is a bidirectional channel, both process can serve as API server, and they can call each other's API.
+Since `StdioRPCChannel` is a bidirectional channel, both process can serve as API server, and they can call each other's API.

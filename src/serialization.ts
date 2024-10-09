@@ -1,6 +1,6 @@
 // serialization.ts
 export interface Message<T = any> {
-  id: number;
+  id: string;
   method: string;
   args: T;
   type: "request" | "response"; // Add a type field to differentiate requests and responses

@@ -1,4 +1,4 @@
-// processChannel.ts
+// StdioRPCChannel.ts
 import {
   serializeMessage,
   deserializeMessage,
@@ -8,6 +8,7 @@ import {
   type Response,
 } from "./serialization.ts";
 import type { StdioInterface } from "./stdio/interface.ts";
+import { generateUUID } from "./utils.ts";
 
 interface PendingRequest {
   resolve: (result: any) => void;
@@ -19,9 +20,8 @@ interface PendingRequest {
  * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style,
  * without needing to deal with `argv`, `stdin`, `stdout` directly.
  */
-export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
-  private idCounter = 0;
-  private pendingRequests: Record<number, PendingRequest> = {};
+export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
+  private pendingRequests: Record<string, PendingRequest> = {};
 
   constructor(
     private stdio: StdioInterface,
@@ -50,7 +50,6 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
           this.handleMessageStr(msgStr);
         }
       } else {
-        console.error("messageStr", messageStr);
         if (messageStr.trim()) {
           this.handleMessageStr(messageStr.trim());
         }
@@ -59,8 +58,6 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   }
 
   private async handleMessageStr(messageStr: string): Promise<void> {
-    // console.error("messageStr", messageStr);
-    // console.error("messageStr", messageStr.trim());
     const parsedMessage = await deserializeMessage(messageStr);
     if (parsedMessage.type === "response") {
       // Handle response
@@ -83,7 +80,7 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
     // ...args: Parameters<API[T] extends (...args: any) => any ? API[T] : never>
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      const messageId = this.idCounter++;
+      const messageId = generateUUID();
       this.pendingRequests[messageId] = { resolve, reject };
 
       const message: Message = {
@@ -143,7 +140,7 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   }
 
   // Send a response to a request
-  private sendResponse<T>(id: number, result: T): void {
+  private sendResponse<T>(id: string, result: T): void {
     const response: Message<Response<T>> = {
       id,
       method: "",
@@ -154,7 +151,7 @@ export class ProcessChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   }
 
   // Send an error response
-  private sendError(id: number, error: string): void {
+  private sendError(id: string, error: string): void {
     const response: Message<Response<null>> = {
       id,
       method: "",
