@@ -15,6 +15,10 @@ interface PendingRequest {
   reject: (error: any) => void;
 }
 
+interface CallbackFunction {
+  (...args: any[]): void;
+}
+
 /**
  * A bidirectional Stdio IPC channel in RPC style.
  * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style,
@@ -22,6 +26,7 @@ interface PendingRequest {
  */
 export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private pendingRequests: Record<string, PendingRequest> = {};
+  private callbacks: Record<string, CallbackFunction> = {};
 
   constructor(
     private stdio: StdioInterface,
@@ -60,10 +65,11 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private async handleMessageStr(messageStr: string): Promise<void> {
     const parsedMessage = await deserializeMessage(messageStr);
     if (parsedMessage.type === "response") {
-      // Handle response
       this.handleResponse(parsedMessage as Message<Response<any>>);
     } else if (parsedMessage.type === "request") {
       this.handleRequest(parsedMessage);
+    } else if (parsedMessage.type === "callback") {
+      this.handleCallback(parsedMessage);
     } else {
       console.error(
         "received unknown message type",
@@ -77,19 +83,29 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   public callMethod<T extends keyof RemoteAPI>(
     method: T,
     args: any[]
-    // ...args: Parameters<API[T] extends (...args: any) => any ? API[T] : never>
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const messageId = generateUUID();
       this.pendingRequests[messageId] = { resolve, reject };
 
+      const callbackIds: string[] = [];
+      const processedArgs = args.map((arg) => {
+        if (typeof arg === "function") {
+          const callbackId = generateUUID();
+          this.callbacks[callbackId] = arg;
+          callbackIds.push(callbackId);
+          return `__callback__${callbackId}`;
+        }
+        return arg;
+      });
+
       const message: Message = {
         id: messageId,
         method: method as string,
-        args,
+        args: processedArgs,
         type: "request",
+        callbackIds: callbackIds.length > 0 ? callbackIds : undefined,
       };
-      //   this.output.write(serializeMessage(message) + "\n");
       this.stdio.write(serializeMessage(message));
     });
   }
@@ -110,7 +126,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
 
   // Handle incoming requests from the other process using a Proxy
   private handleRequest(request: Message): void {
-    const { id, method, args } = request;
+    const { id, method, args, callbackIds } = request;
     const apiProxy = new Proxy(this.apiImplementation, {
       get: (target, prop: string) => {
         if (typeof target[prop as keyof LocalAPI] === "function") {
@@ -122,11 +138,20 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       },
     });
 
+    const processedArgs = args.map((arg: any, index: number) => {
+      if (typeof arg === "string" && arg.startsWith("__callback__")) {
+        const callbackId = arg.slice(12);
+        return (...callbackArgs: any[]) => {
+          this.invokeCallback(callbackId, callbackArgs);
+        };
+      }
+      return arg;
+    });
+
     try {
-      //   const result = apiProxy[method as keyof API](...args);
       const result = (apiProxy[method as keyof LocalAPI] as Function).apply(
         apiProxy,
-        args
+        processedArgs
       );
 
       Promise.resolve(result)
@@ -136,6 +161,26 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
         .catch((err) => this.sendError(id, err.message));
     } catch (error: any) {
       this.sendError(id, error.message ?? error.toString());
+    }
+  }
+
+  private invokeCallback(callbackId: string, args: any[]): void {
+    const message: Message = {
+      id: generateUUID(),
+      method: callbackId,
+      args,
+      type: "callback",
+    };
+    this.stdio.write(serializeMessage(message));
+  }
+
+  private handleCallback(message: Message): void {
+    const { method: callbackId, args } = message;
+    const callback = this.callbacks[callbackId];
+    if (callback) {
+      callback(...args);
+    } else {
+      console.error(`Callback with id ${callbackId} not found`);
     }
   }
 
@@ -166,7 +211,6 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       get:
         (_, method: string) =>
         (...args: unknown[]) => {
-          //   console.log("getApi", method, args);
           return this.callMethod(method as keyof RemoteAPI, args);
         },
     });

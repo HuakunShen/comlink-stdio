@@ -3,7 +3,8 @@ export interface Message<T = any> {
   id: string;
   method: string;
   args: T;
-  type: "request" | "response"; // Add a type field to differentiate requests and responses
+  type: "request" | "response" | "callback"; // Add "callback" type
+  callbackIds?: string[]; // Add callbackIds field
 }
 
 export interface Response<T = any> {
@@ -13,7 +14,7 @@ export interface Response<T = any> {
 
 // Serialize a message
 export function serializeMessage<T>(message: Message<T>): string {
-  return JSON.stringify(message);
+  return JSON.stringify(message) + "\n";
 }
 
 // Deserialize a message
@@ -31,7 +32,7 @@ export function deserializeMessage<T>(message: string): Promise<Message<T>> {
 
 // Serialize a response
 export function serializeResponse<T>(response: Response<T>): string {
-  return JSON.stringify(response);
+  return JSON.stringify(response) + "\n";
 }
 
 // Deserialize a response

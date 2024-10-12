@@ -20,6 +20,6 @@ jobs:
       - name: CI
         run: |
           bun install
-          bun test
+          bun test --rerun-each 10
       - name: Publish package
         run: npx jsr publish

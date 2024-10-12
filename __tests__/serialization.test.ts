@@ -10,7 +10,7 @@ import {
 describe("Serializer", () => {
   test("should serialize and deserialize a message", async () => {
     const message: Message = {
-      id: 1,
+      id: "1",
       method: "testMethod",
       args: [1, 2, 3],
       type: "request",
