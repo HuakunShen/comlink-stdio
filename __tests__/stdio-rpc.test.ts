@@ -28,6 +28,33 @@ async function runWorker(worker: ChildProcessWithoutNullStreams) {
 
   expect(sum2).toEqual(3);
   expect(await api.subtract(1, 2)).toEqual(-1);
+
+  // stress test
+  for (let i = 0; i < 10_000; i++) {
+    expect(await api.add(i, i)).toEqual(i + i);
+    expect(await api.subtract(i, i)).toEqual(0);
+  }
+  // stress test with concurrent calls
+  await Promise.all(
+    Array(5_000)
+      .fill(0)
+      .map(async (x, idx) => expect(await api.add(idx, idx)).toEqual(idx + idx))
+  );
+  await Promise.all(
+    Array(5_000)
+      .fill(0)
+      .map(() =>
+        api.addCallback(1, 2, (sum) => {
+          //   expect(sum).toEqual(3);
+        })
+      )
+  );
+  const dummyCallback = (sum: number) => {};
+  await Promise.all(
+    Array(5_000)
+      .fill(0)
+      .map(() => api.addCallback(1, 2, dummyCallback))
+  );
   worker.kill();
 }
 

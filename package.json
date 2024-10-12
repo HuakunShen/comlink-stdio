@@ -3,7 +3,8 @@
   "version": "0.1.4",
   "scripts": {
     "predocs": "deno types > deno.d.ts",
-    "docs": "typedoc --out docs"
+    "docs": "typedoc --out docs",
+    "test": "bun test --rerun-each 10"
   },
   "author": {
     "name": "Huakun Shen",

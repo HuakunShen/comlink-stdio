@@ -27,6 +27,8 @@ interface CallbackFunction {
 export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private pendingRequests: Record<string, PendingRequest> = {};
   private callbacks: Record<string, CallbackFunction> = {};
+  private callbackCache: Map<CallbackFunction, string> = new Map();
+  private messageStr = "";
 
   constructor(
     private stdio: StdioInterface,
@@ -44,20 +46,14 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       if (!buffer) {
         return;
       }
-      const messageStr = buffer.toString("utf-8");
-      if (messageStr.includes("\n")) {
-        const msgStrs = messageStr
-          .split("\n")
-          .map((msg) => msg.trim())
-          .filter(Boolean);
+      this.messageStr += buffer.toString("utf-8");
+      const lastChar = this.messageStr[this.messageStr.length - 1];
+      const msgsSplit = this.messageStr.split("\n");
+      let msgs = lastChar === "\n" ? msgsSplit : msgsSplit.slice(0, -1); // remove the last incomplete message
+      this.messageStr = lastChar === "\n" ? "" : msgsSplit.at(-1) ?? "";
 
-        for (const msgStr of msgStrs) {
-          this.handleMessageStr(msgStr);
-        }
-      } else {
-        if (messageStr.trim()) {
-          this.handleMessageStr(messageStr.trim());
-        }
+      for (const msgStr of msgs.map((msg) => msg.trim()).filter(Boolean)) {
+        this.handleMessageStr(msgStr);
       }
     }
   }
@@ -91,8 +87,15 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       const callbackIds: string[] = [];
       const processedArgs = args.map((arg) => {
         if (typeof arg === "function") {
-          const callbackId = generateUUID();
-          this.callbacks[callbackId] = arg;
+          let callbackId = this.callbackCache.get(arg);
+          if (!callbackId) {
+            callbackId = generateUUID();
+            this.callbacks[callbackId] = arg;
+            // console.log("callbacks size", Object.keys(this.callbacks).length);
+            this.callbackCache.set(arg, callbackId);
+          } else {
+            //   console.log("callbackId already exists", callbackId);
+          }
           callbackIds.push(callbackId);
           return `__callback__${callbackId}`;
         }
@@ -179,6 +182,9 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
     const callback = this.callbacks[callbackId];
     if (callback) {
       callback(...args);
+      // delete this.callbacks[callbackId];
+      // console.log("callback size", Object.keys(this.callbacks).length);
+      // this.cleanupCallbacks();
     } else {
       console.error(`Callback with id ${callbackId} not found`);
     }
@@ -215,4 +221,27 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
         },
     });
   }
+
+  /**
+   * Free up the callback map and cache
+   * If you use callbacks a lot, you could get memory leak.
+   * e.g. If you use anonymous callback function in a 5000 iterations loop,
+   * you will get 5000 callbacks in cache. It's a better idea to free them.
+   *
+   * If you use a named callback function, there will be only one entry in the cache.
+   */
+  freeCallbacks() {
+    this.callbacks = {};
+    this.callbackCache.clear();
+  }
+
+  // Add a new method to clean up callbacks that are no longer needed
+  // private cleanupCallbacks(): void {
+  //   // console.log("cleanupCallbacks");
+  //   for (const [func, id] of this.callbackCache.entries()) {
+  //     if (!this.callbacks[id]) {
+  //       this.callbackCache.delete(func);
+  //     }
+  //   }
+  // }
 }

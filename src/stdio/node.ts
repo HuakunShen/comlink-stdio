@@ -1,25 +1,53 @@
 // stdio_node.ts
 import { type StdioInterface } from "./interface.ts";
+import { Readable, Writable } from "node:stream";
 
 /**
  * Stdio implementation for Node.js
  * Simply wrap Node.js's `process.stdin` and `process.stdout` to follow StdioInterface
  */
 export class NodeStdio implements StdioInterface {
-  constructor(
-    private readStream: NodeJS.ReadableStream = process.stdin,
-    private writeStream: NodeJS.WritableStream = process.stdout
-  ) {}
+  private readStream: Readable;
+  private writeStream: Writable;
+  private dataHandler: ((chunk: Buffer) => void) | null = null;
+  private errorHandler: ((error: Error) => void) | null = null;
+
+  constructor(readStream: Readable, writeStream: Writable) {
+    this.readStream = readStream;
+    this.writeStream = writeStream;
+
+    // Set up persistent listeners
+    this.readStream.on("error", (error) => {
+      if (this.errorHandler) this.errorHandler(error);
+    });
+  }
 
   async read(): Promise<Buffer | null> {
     return new Promise((resolve, reject) => {
-      this.readStream.on("data", (chunk) => {
+      const onData = (chunk: Buffer) => {
+        cleanup();
         resolve(chunk);
-      });
-      this.readStream.on("end", () => {
-        // resolve(Buffer.concat(chunks));
-      });
-      this.readStream.on("error", reject);
+      };
+
+      const onEnd = () => {
+        cleanup();
+        resolve(null);
+      };
+
+      const onError = (error: Error) => {
+        cleanup();
+        reject(error);
+      };
+
+      const cleanup = () => {
+        this.readStream.removeListener("data", onData);
+        this.readStream.removeListener("end", onEnd);
+        this.readStream.removeListener("error", onError);
+      };
+
+      this.readStream.once("data", onData);
+      this.readStream.once("end", onEnd);
+      this.readStream.once("error", onError);
     });
   }
 
