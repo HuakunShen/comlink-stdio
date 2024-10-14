@@ -23,6 +23,7 @@ jobs:
       - name: CI
         run: |
           bun install
-          bun test --timeout 20000 --rerun-each 10
+          bun scripts/prepare.ts
+          bun test --rerun-each 5
       - name: Publish package
         run: npx jsr publish

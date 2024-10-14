@@ -4,8 +4,9 @@ import { spawn } from "child_process";
 import { NodeStdio } from "../mod.ts";
 
 // const worker = spawn("deno", ["examples/deno-child.ts"]);
-const worker = spawn("bun", ["examples/node-child.ts"]);
-worker.stderr.pipe(process.stdout);
+const worker = spawn("node", ["examples/node-child.js"]);
+// const worker = spawn("bun", ["examples/bun-child.ts"]);
+// worker.stderr.pipe(process.stdout);
 
 // const stdio = createStdio();
 const stdio = new NodeStdio(worker.stdout, worker.stdin);
@@ -22,13 +23,14 @@ for (let i = 0; i < 100; i++) {
 function addCallback2(sum: number) {
   // console.log("sum from callback", sum);
 }
+
 await Promise.all(
   Array(5000)
     .fill(0)
-    .map(() => api.add(1, 2).then(() => api.addCallback(1, 2, (sum) => {})))
+    .map(() => api.add(1, 2).then((sum) => api.addCallback(1, 2, (sum) => {})))
 );
 await Promise.all(
-  Array(5000)
+  Array(50)
     .fill(0)
     .map(() => api.add(1, 2).then(() => api.addCallback(1, 2, addCallback2)))
 );
@@ -38,4 +40,5 @@ api.addCallback(1, 2, (sum) => {
   console.log("sum from callback", sum);
 });
 await api.subtract(1, 2).then(console.log);
+
 worker.kill();

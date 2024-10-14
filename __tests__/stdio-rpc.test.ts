@@ -12,7 +12,7 @@ const testsPath = path.join(projectRoot, "__tests__");
 console.log("testsPath", testsPath);
 
 async function runWorker(worker: ChildProcessWithoutNullStreams) {
-  worker.stderr.pipe(process.stdout);
+  // worker.stderr.pipe(process.stdout);
 
   // const stdio = createStdio();
   const stdio = new NodeStdio(worker.stdout, worker.stdin);
@@ -66,8 +66,8 @@ describe("RPCChannel Test", () => {
     await runWorker(workerDeno);
   });
   test("NodeStdio", async () => {
-    const workerBun = spawn("bun", [
-      path.join(testsPath, "scripts/node-api.ts"),
+    const workerBun = spawn("node", [
+      path.join(testsPath, "scripts/node-api.js"),
     ]);
     await runWorker(workerBun);
   });

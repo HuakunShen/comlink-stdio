@@ -28,12 +28,10 @@ export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private pendingRequests: Record<string, PendingRequest> = {};
   private callbacks: Record<string, CallbackFunction> = {};
   private callbackCache: Map<CallbackFunction, string> = new Map();
+  private count: number = 0;
   private messageStr = "";
 
-  constructor(
-    private io: StdioInterface,
-    private apiImplementation: LocalAPI
-  ) {
+  constructor(private io: StdioInterface, private apiImplementation: LocalAPI) {
     this.listen();
   }
 
@@ -59,6 +57,8 @@ export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   }
 
   private async handleMessageStr(messageStr: string): Promise<void> {
+    this.count++;
+    // console.error(`count: ${this.count}`);
     const parsedMessage = await deserializeMessage(messageStr);
     if (parsedMessage.type === "response") {
       this.handleResponse(parsedMessage as Message<Response<any>>);

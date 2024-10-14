@@ -176,3 +176,5 @@ dist
 .vscode/
 deno.d.ts
 docs/
+
+**/*.js
