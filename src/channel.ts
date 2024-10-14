@@ -1,4 +1,4 @@
-// StdioRPCChannel.ts
+// RPCChannel.ts
 import {
   serializeMessage,
   deserializeMessage,
@@ -24,14 +24,14 @@ interface CallbackFunction {
  * This allows 2 JS/TS processes to call each other's API like using libraries in RPC style,
  * without needing to deal with `argv`, `stdin`, `stdout` directly.
  */
-export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
+export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
   private pendingRequests: Record<string, PendingRequest> = {};
   private callbacks: Record<string, CallbackFunction> = {};
   private callbackCache: Map<CallbackFunction, string> = new Map();
   private messageStr = "";
 
   constructor(
-    private stdio: StdioInterface,
+    private io: StdioInterface,
     private apiImplementation: LocalAPI
   ) {
     this.listen();
@@ -39,7 +39,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
 
   private async listen(): Promise<void> {
     while (true) {
-      const buffer = await this.stdio.read();
+      const buffer = await this.io.read();
       if (!buffer) {
         continue;
       }
@@ -109,7 +109,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
         type: "request",
         callbackIds: callbackIds.length > 0 ? callbackIds : undefined,
       };
-      this.stdio.write(serializeMessage(message));
+      this.io.write(serializeMessage(message));
     });
   }
 
@@ -174,7 +174,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       args,
       type: "callback",
     };
-    this.stdio.write(serializeMessage(message));
+    this.io.write(serializeMessage(message));
   }
 
   private handleCallback(message: Message): void {
@@ -198,7 +198,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       args: { result },
       type: "response",
     };
-    this.stdio.write(serializeMessage(response));
+    this.io.write(serializeMessage(response));
   }
 
   // Send an error response
@@ -209,7 +209,7 @@ export class StdioRPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
       args: { error },
       type: "response",
     };
-    this.stdio.write(serializeMessage(response));
+    this.io.write(serializeMessage(response));
   }
 
   public getApi(): RemoteAPI {

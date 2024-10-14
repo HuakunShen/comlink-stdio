@@ -1,4 +1,4 @@
-import { StdioRPCChannel } from "../src/channel.ts";
+import { RPCChannel } from "../src/channel.ts";
 import { apiMethods, type API } from "./api.ts";
 import { spawn } from "child_process";
 import { NodeStdio } from "../mod.ts";
@@ -9,7 +9,7 @@ worker.stderr.pipe(process.stdout);
 
 // const stdio = createStdio();
 const stdio = new NodeStdio(worker.stdout, worker.stdin);
-const parent = new StdioRPCChannel<{}, API>(stdio, {});
+const parent = new RPCChannel<{}, API>(stdio, {});
 const api = parent.getApi();
 
 for (let i = 0; i < 100; i++) {

@@ -1,5 +1,5 @@
 import { expect, test, describe } from "bun:test";
-import { StdioRPCChannel } from "../src/channel.ts";
+import { RPCChannel } from "../src/channel.ts";
 import { apiMethods, type API } from "./scripts/api.ts";
 import { spawn } from "child_process";
 import { NodeStdio, DenoStdio } from "../mod.ts";
@@ -16,7 +16,7 @@ async function runWorker(worker: ChildProcessWithoutNullStreams) {
 
   // const stdio = createStdio();
   const stdio = new NodeStdio(worker.stdout, worker.stdin);
-  const parent = new StdioRPCChannel<{}, API>(stdio, {});
+  const parent = new RPCChannel<{}, API>(stdio, {});
   const api = parent.getApi();
 
   expect(await api.add(1, 2)).toEqual(3);
@@ -58,7 +58,7 @@ async function runWorker(worker: ChildProcessWithoutNullStreams) {
   worker.kill();
 }
 
-describe("StdioRPCChannel Test", () => {
+describe("RPCChannel Test", () => {
   test("DenoStdio", async () => {
     const workerDeno = spawn("deno", [
       path.join(testsPath, "scripts/deno-api.ts"),
