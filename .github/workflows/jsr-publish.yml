@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
 
     permissions:
