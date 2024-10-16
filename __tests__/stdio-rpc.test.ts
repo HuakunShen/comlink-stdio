@@ -4,8 +4,14 @@ import { apiMethods, type API } from "./scripts/api.ts";
 import { spawn } from "child_process";
 import { NodeStdio, DenoStdio } from "../mod.ts";
 import path from "node:path";
-import { getProjectRoot } from "../src/utils.ts";
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
+
+function getProjectRoot(): string {
+  const fileUrl = new URL(import.meta.url).pathname;
+  const folderPath = path.dirname(path.dirname(fileUrl));
+  return folderPath;
+}
+
 
 const projectRoot = getProjectRoot();
 const testsPath = path.join(projectRoot, "__tests__");

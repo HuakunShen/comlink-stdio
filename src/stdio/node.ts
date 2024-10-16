@@ -1,6 +1,7 @@
 // stdio_node.ts
 import { type StdioInterface } from "./interface.ts";
 import { Readable, Writable } from "node:stream";
+import { type Buffer } from "node:buffer";
 
 /**
  * Stdio implementation for Node.js
