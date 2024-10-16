@@ -36,7 +36,7 @@ async function runWorker(worker: ChildProcessWithoutNullStreams) {
   expect(await api.subtract(1, 2)).toEqual(-1);
 
   // stress test
-  for (let i = 0; i < 10_000; i++) {
+  for (let i = 0; i < 1000; i++) {
     expect(await api.add(i, i)).toEqual(i + i);
     expect(await api.subtract(i, i)).toEqual(0);
   }

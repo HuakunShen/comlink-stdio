@@ -4,6 +4,7 @@
     "jsr:@std/assert@1": "1.0.6",
     "jsr:@std/internal@^1.0.4": "1.0.4",
     "npm:@types/bun@latest": "1.1.9",
+    "npm:@types/node@^22.7.5": "22.7.5",
     "npm:typedoc@~0.26.8": "0.26.8_typescript@5.6.2"
   },
   "jsr": {
@@ -78,7 +79,13 @@
     "@types/node@20.12.14": {
       "integrity": "sha512-scnD59RpYD91xngrQQLGkE+6UrHUPzeKZWhhjBSa3HSkwjbQc38+q3RoIVEwxQGRw3M+j5hpNAM+lgV3cVormg==",
       "dependencies": [
-        "undici-types"
+        "undici-types@5.26.5"
+      ]
+    },
+    "@types/node@22.7.5": {
+      "integrity": "sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==",
+      "dependencies": [
+        "undici-types@6.19.8"
       ]
     },
     "@types/unist@3.0.3": {
@@ -287,6 +294,9 @@
     "undici-types@5.26.5": {
       "integrity": "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="
     },
+    "undici-types@6.19.8": {
+      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
     "unist-util-is@6.0.0": {
       "integrity": "sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==",
       "dependencies": [
@@ -348,6 +358,7 @@
     "packageJson": {
       "dependencies": [
         "npm:@types/bun@latest",
+        "npm:@types/node@^22.7.5",
         "npm:typedoc@~0.26.8"
       ]
     }
