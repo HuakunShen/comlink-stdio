@@ -1,6 +1,6 @@
 import { RPCChannel } from "../src/channel.ts";
 import { apiMethods, type API } from "./api.ts";
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 import { NodeStdio } from "../mod.ts";
 
 // const worker = spawn("deno", ["examples/deno-child.ts"]);
