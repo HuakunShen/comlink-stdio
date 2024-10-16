@@ -21,12 +21,12 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/node": "^22.7.5",
     "typedoc": "^0.26.8"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {},
   "files": [
     "README.md",
     "src",
