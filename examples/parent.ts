@@ -3,8 +3,8 @@ import { apiMethods, type API } from "./api.ts";
 import { spawn } from "node:child_process";
 import { NodeStdio } from "../mod.ts";
 
-// const worker = spawn("deno", ["examples/deno-child.ts"]);
-const worker = spawn("node", ["examples/node-child.js"]);
+const worker = spawn("deno", ["examples/deno-child.ts"]);
+// const worker = spawn("node", ["examples/node-child.js"]);
 // const worker = spawn("bun", ["examples/bun-child.ts"]);
 // worker.stderr.pipe(process.stdout);
 
@@ -12,6 +12,11 @@ const worker = spawn("node", ["examples/node-child.js"]);
 const stdio = new NodeStdio(worker.stdout, worker.stdin);
 const parent = new RPCChannel<{}, API>(stdio, {});
 const api = parent.getApi();
+console.log(
+  await api.math.add(1, 2, (result) =>
+    console.log("result from callback", result)
+  )
+);
 
 for (let i = 0; i < 100; i++) {
   await api.add(1, 2);

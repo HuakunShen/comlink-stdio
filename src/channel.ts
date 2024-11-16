@@ -129,19 +129,33 @@ export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
 
   // Handle incoming requests from the other process using a Proxy
   private handleRequest(request: Message): void {
-    const { id, method, args, callbackIds } = request;
-    const apiProxy = new Proxy(this.apiImplementation, {
-      get: (target, prop: string) => {
-        if (typeof target[prop as keyof LocalAPI] === "function") {
-          return (...args: unknown[]) =>
-            (target[prop as keyof LocalAPI] as Function)(...args);
-        } else {
-          throw new Error(`Method ${prop} not found`);
-        }
-      },
-    });
+    const { id, method, args } = request;
 
-    const processedArgs = args.map((arg: any, index: number) => {
+    // Split the method path and traverse the API implementation
+    const methodPath = method.split(".");
+    let target: any = this.apiImplementation;
+
+    // Traverse the object path
+    for (let i = 0; i < methodPath.length - 1; i++) {
+      target = target[methodPath[i]];
+      if (!target) {
+        this.sendError(
+          id,
+          `Method path ${method} not found at ${methodPath[i]}`
+        );
+        return;
+      }
+    }
+
+    const finalMethod = methodPath[methodPath.length - 1];
+    const targetMethod = target[finalMethod];
+
+    if (typeof targetMethod !== "function") {
+      this.sendError(id, `Method ${method} is not a function`);
+      return;
+    }
+
+    const processedArgs = args.map((arg: any) => {
       if (typeof arg === "string" && arg.startsWith("__callback__")) {
         const callbackId = arg.slice(12);
         return (...callbackArgs: any[]) => {
@@ -152,11 +166,7 @@ export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
     });
 
     try {
-      const result = (apiProxy[method as keyof LocalAPI] as Function).apply(
-        apiProxy,
-        processedArgs
-      );
-
+      const result = targetMethod.apply(target, processedArgs);
       Promise.resolve(result)
         .then((res) => {
           return this.sendResponse(id, res);
@@ -212,14 +222,24 @@ export class RPCChannel<LocalAPI extends {}, RemoteAPI extends {}> {
     this.io.write(serializeMessage(response));
   }
 
-  public getApi(): RemoteAPI {
-    return new Proxy({} as RemoteAPI, {
-      get:
-        (_, method: string) =>
-        (...args: unknown[]) => {
-          return this.callMethod(method as keyof RemoteAPI, args);
-        },
+  private createNestedProxy(chain: string[] = []): any {
+    return new Proxy(() => {}, {
+      get: (_target, prop: string | symbol) => {
+        // Prevent special properties like `toString` or `then` from being treated as part of the chain
+        if (typeof prop === "string" && prop !== "then") {
+          return this.createNestedProxy([...chain, prop]);
+        }
+        return undefined;
+      },
+      apply: (_target, _thisArg, args: any[]) => {
+        const method = chain.join(".");
+        return this.callMethod(method as keyof RemoteAPI, args);
+      },
     });
+  }
+
+  public getApi(): RemoteAPI {
+    return this.createNestedProxy() as RemoteAPI;
   }
 
   /**

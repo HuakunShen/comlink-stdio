@@ -12,7 +12,6 @@ function getProjectRoot(): string {
   return folderPath;
 }
 
-
 const projectRoot = getProjectRoot();
 const testsPath = path.join(projectRoot, "__tests__");
 console.log("testsPath", testsPath);
@@ -61,6 +60,21 @@ async function runWorker(worker: ChildProcessWithoutNullStreams) {
       .fill(0)
       .map(() => api.addCallback(1, 2, dummyCallback))
   );
+
+  /* -------------------------------------------------------------------------- */
+  /*                              Nested Object API                             */
+  /* -------------------------------------------------------------------------- */
+  expect(await api.math.grade1.add(1, 2)).toEqual(3);
+  expect(await api.math.grade2.multiply(2, 3)).toEqual(6);
+
+  // /* --------------------- Nested Object API with Callback -------------------- */
+  // expect(
+  //   await api.math.grade1.add(1, 2, (result) => expect(result).toEqual(3))
+  // ).toEqual(3);
+  // expect(
+  //   await api.math.grade2.multiply(2, 3, (result) => expect(result).toEqual(6))
+  // ).toEqual(6);
+
   worker.kill();
 }
 
