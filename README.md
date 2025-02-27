@@ -1,3 +1,7 @@
+
+> [!CAUTION]
+> This project is archived and migrated to https://github.com/kunkunsh/kkrpc
+
 # comlink-stdio
 
 [![NPM Version](https://img.shields.io/npm/v/comlink-stdio)](https://www.npmjs.com/package/comlink-stdio)
