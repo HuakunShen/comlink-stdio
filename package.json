@@ -1,6 +1,6 @@
 {
   "name": "comlink-stdio",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "scripts": {
     "predocs": "deno types > deno.d.ts",
     "docs": "typedoc --out docs",
